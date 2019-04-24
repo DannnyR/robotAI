@@ -5,8 +5,8 @@ import arcade
 
 # --- Constants ---
 SPRITE_SCALING_HERO = 0.5
-SPRITE_SCALING_ROBOT = 0.3
-ROBOT_COUNT = 50
+SPRITE_SCALING_ROBOT = 0.2
+ROBOT_COUNT = 60
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
@@ -17,10 +17,10 @@ class Robot(arcade.Sprite):
     def update(self):
         self.center_y -= 1
 
-class Window(arcade.Window):
+class View(arcade.Window):
     # Window creation class
 
-    def __inti__(self):
+    def __init__(self):
         # StartS WINDOW
         # 1. arcade.open_window(SCREEN_WIDTH, SCREEN_HEIGHT,"WINDOW TEST")
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT,"Robot_AI – \
@@ -32,13 +32,14 @@ The machine spirits have awoken; to the detriment of mankind!")
 
         # Hero set up inf0
         self.hero_sprite = None
-        self.robot_list = None
+        # Score
+        self.score = 0
 
         # Mouse cursor remover
         self.set_mouse_visible(False)
 
         # Background color
-        arcade.set_background_color(arcade.color.Black)
+        arcade.set_background_color(arcade.color.AMAZON)
 
     def setup(self):
         """Starts game initializing vars"""
@@ -47,16 +48,13 @@ The machine spirits have awoken; to the detriment of mankind!")
         self.hero_list = arcade.SpriteList()
         self.robot_list = arcade.SpriteList()
 
-        # Score
-        self.score = 0
-
         # setup HERO - hat tip Collin
-        self.hero_sprite = arcade.Sprite("Gun_Knight.gif")
-        self.hero_sprite.center_x = 50
+        self.hero_sprite = arcade.Sprite("Gun_Knight.gif", SPRITE_SCALING_HERO)
+        self.hero_sprite.center_x = 80
         self.hero_sprite.center_y = 50
         self.hero_list.append(self.hero_sprite)
 
-        # creat robotAIs - hat tip Dan
+        # creat robot - hat tip Dan
         for i in range(ROBOT_COUNT):
 
             # Robots created
@@ -77,13 +75,13 @@ The machine spirits have awoken; to the detriment of mankind!")
         self.hero_list.draw()
         # Text Creation on Screen
         output = f"Score: {self.score}"
-        arcade.draw_text(output, 10, 20, arcade.color.RED, 14)
+        arcade.draw_text(output, 10, 20, arcade.color.BLACK, 14)
 
     def on_mouse_motion(self, x, y, dx, dy):
         """MOUSE CTRL COMMANDS"""
         # Hero Mouse Matched
-        self.hero.bottom_x = x
-        self.hero.center_y = x
+        self.hero_sprite.center_x = x
+        self.hero_sprite.center_y = x
 
     def update(self, delta_time):
         """Moving Logic for Game"""
@@ -99,7 +97,7 @@ The machine spirits have awoken; to the detriment of mankind!")
 
 def main():
     # Main Event
-    window = Window()
+    window = View()
     window.setup()
     arcade.run()
     # 3. DISPLAY RESULTS
@@ -110,23 +108,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
