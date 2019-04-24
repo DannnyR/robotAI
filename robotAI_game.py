@@ -52,7 +52,7 @@ The machine spirits have awoken; to the detriment of mankind!")
 
         # setup HERO - hat tip Collin
         self.hero_sprite = arcade.Sprite("Gun_Knight.gif")
-        self.hero_sprite.bottom_x = 50
+        self.hero_sprite.center_x = 50
         self.hero_sprite.center_y = 50
         self.hero_list.append(self.hero_sprite)
 
@@ -62,7 +62,7 @@ The machine spirits have awoken; to the detriment of mankind!")
             # Robots created
             robot = Robot("ROBOT-MARK1.gif", SPRITE_SCALING_ROBOT)
             # ROBOT PLACED ON MAP
-            robot.top_x = random.randrange(SCREEN_WIDTH)
+            robot.center_x = random.randrange(SCREEN_WIDTH)
             robot.center_y = random.randrange(SCREEN_HEIGHT)
             # ADD ROBOTS TO LIST
             self.robot_list.append(robot)
