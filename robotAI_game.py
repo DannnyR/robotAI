@@ -5,7 +5,7 @@ import arcade
 
 # --- Constants ---
 SPRITE_SCALING_HERO = 0.5
-SPRITE_SCALING_ROBOT = 0.2
+SPRITE_SCALING_ROBOT = 0.9
 ROBOT_COUNT = 60
 
 SCREEN_WIDTH = 800
@@ -13,9 +13,14 @@ SCREEN_HEIGHT = 800
 
 class Robot(arcade.Sprite):
     # Robots sprite creation
-    
     def update(self):
         self.center_y -= 1
+        # Off screen - BRINGS ROBOTS BACK AROUND FOR ANOTHER PASS
+        if self.top < 0:
+            # THIS RESETS ROBOT SO THEY NEVER STOP
+            self.center_y = random.randrange(SCREEN_HEIGHT + 20,
+                                             SCREEN_HEIGHT + 100)
+            self.center_x = random.randrange(SCREEN_WIDTH)
 
 class View(arcade.Window):
     # Window creation class
@@ -81,7 +86,7 @@ The machine spirits have awoken; to the detriment of mankind!")
         """MOUSE CTRL COMMANDS"""
         # Hero Mouse Matched
         self.hero_sprite.center_x = x
-        self.hero_sprite.center_y = x
+        self.hero_sprite.center_y = y # Had incorrect x on this limited side to side movement
 
     def update(self, delta_time):
         """Moving Logic for Game"""
@@ -92,8 +97,12 @@ The machine spirits have awoken; to the detriment of mankind!")
                                                          self.robot_list)
         # for loop for counting collisions and removing dead robots
         for robot in hit_list:
-            robot.kill()
+            # robot.kill() ---NO KILL COMMAND CONTIMUES ROBOT TOP OF SCREEN
             self.score += 1
+            # RANDOM RESETS OF ROBOT
+            robot.center_y = random.randrange(SCREEN_HEIGHT + 20,
+                                              SCREEN_HEIGHT + 100)
+            robot.center_y = random.randrange(SCREEN_WIDTH)
 
 def main():
     # Main Event
