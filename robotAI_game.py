@@ -8,7 +8,7 @@ import arcade
 SPRITE_SCALING_HERO = 0.3
 SPRITE_SCALING_ROBOT = 0.6
 SPRITE_SCALING_BULLET = 0.8
-ROBOT_COUNT = 20
+ROBOT_COUNT = 70
 
 SCREEN_WIDTH = 1800
 SCREEN_HEIGHT = 700
@@ -33,7 +33,7 @@ class Robot(arcade.Sprite):
         self.center_y += self.change_y
         # Off screen - Bounce ROBOTS BACK AROUND FOR ANOTHER PASS
         if self.left < 0:
-            self.change_x *= -1
+            self.change_x *= -2
             
         if self.right > SCREEN_WIDTH:
             self.change_x *= -1
@@ -69,6 +69,7 @@ The machine spirits have awoken; to the detriment of mankind!")
 
         # Background color
         arcade.set_background_color(arcade.color.ASH_GREY)
+        
 
     def setup(self):
         """Starts game initializing vars"""
@@ -96,10 +97,12 @@ The machine spirits have awoken; to the detriment of mankind!")
             # ROBOT PLACED ON MAP
             robot.center_x = random.randrange(SCREEN_WIDTH)
             robot.center_y = random.randrange(SCREEN_WIDTH)
+            # Twiked the negative numbers below to keep bots on screen
             robot.change_x = random.randrange(-1, 2)
             robot.change_y = random.randrange(-2, 1)
             # ADD ROBOTS TO LIST
             self.robot_list.append(robot)
+            
         # Bullet
         self.bullet_sprite = arcade.Sprite("bullet.gif")
         #Add to List
@@ -116,7 +119,7 @@ The machine spirits have awoken; to the detriment of mankind!")
         self.bullet_list.draw()
         # Text Creation on Screen
         output = f"Score: {self.score}"
-        arcade.draw_text(output, 10, 20, arcade.color.BLACK, 14)
+        arcade.draw_text(output, 20, 20, arcade.color.BLACK, 25)
         """
         self.wall_list.draw()
         This will be the code for the walls
@@ -137,6 +140,13 @@ The machine spirits have awoken; to the detriment of mankind!")
         bullet.center_y = self.hero_sprite.center_y
         bullet.left = self.hero_sprite.right
         self.bullet_list.append(bullet)
+
+    def Sound_ON_Mouse(self):
+        # LOADS SOUND
+        self.laser_sound = arcade.load_sound("laser.wav")
+        # MOUSE LEFT OR RIGHT KEY PRESS TRIGGERS LASER-SOUND
+        if key == arcade.key.LEFT or RIGHT:
+            arcade.play_sound(self.laser_sound)
         
         
         
@@ -180,6 +190,14 @@ The machine spirits have awoken; to the detriment of mankind!")
             self.hero.change_y = MOVEMENT_SPEED
         elif key == arcade.key.DOWN:
             self.hero.change_y = -MOVEMENT_SPEED
+            # SPACE BAR PRESSED
+        elif key == arcade.key.SPACE:
+            self.bullet.change_y and change_x ####
+        # SOUND LASER FIRES laser.wav FILE
+        # SPACE BAR AND LEFT AND RIGHT MOUSE KEYS
+        elif key == arcade.key.SPACE:
+            arcade.play_sound(self.laser_sound)
+        
 
     def Key_Release(self, key, modifiers):
         # When key released
@@ -187,6 +205,9 @@ The machine spirits have awoken; to the detriment of mankind!")
             self.hero.change_x = 0
         elif key == arcade.UP or key == arcade.key.DOWN:
             self.hero.change_y = 0
+        # SPACE BAR RELEASED
+        #elif key == arcade.SPACE
+            #self.hero.change_y = 0
     
         
 def main():
