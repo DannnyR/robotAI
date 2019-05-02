@@ -14,8 +14,36 @@ SCREEN_WIDTH = 1800
 SCREEN_HEIGHT = 700
 
 Bullet_Speed = 5
+MOVEMENT_SPEED = 2
 
+class hero:
+    def __init__(self, position_x, position_y, change_x, change_y):
+        # Take the parameters of the init function above,
+        # and create instance variables out of them.
+        self.position_x = position_x
+        self.position_y = position_y
+        self.change_x = change_x
+        self.change_y = change_y
 
+    def draw(self):
+        # HERO instance vars
+        arcade.sprite_hero(self.position_x, self.position_y)
+
+    def update(self):
+        self.position_y += self.change_y
+        self.position_x += self.change_x
+        # Keep hero on screen
+        if self.position_x < self.radius:
+            self.position_x = self.radius
+            
+        if self.position_x > SCREEN_WIDTH - self.radius:
+            self.position_x = SCREEN_WIDTH - self.radius
+            
+        if self.position_y < self.radius:
+            self.position_y = self.radius
+            
+        if self.position_y > SCREEN_HEIGHT - self.radius:
+            self.position_y = SCREEN_HEIGHT - self.radius        
 
 class Robot(arcade.Sprite):
     # Robots sprite creation
@@ -29,8 +57,11 @@ class Robot(arcade.Sprite):
         self.center_x = 0
             
     def update(self):
-        self.center_x += self.change_x
-        self.center_y += self.change_y
+        # REMOVING THE TWO STATEMENTS BELOW - CHANGING
+        # LINE 36 MOVE BOTS LEFT ONLY ------
+        #self.center_x += self.change_x
+        #self.center_y += self.change_y
+        self.center_x -=1
         # Off screen - Bounce ROBOTS BACK AROUND FOR ANOTHER PASS
         if self.left < 0:
             self.change_x *= -2
@@ -51,9 +82,12 @@ class View(arcade.Window):
     def __init__(self):
         # StartS WINDOW
         # 1. arcade.open_window(SCREEN_WIDTH, SCREEN_HEIGHT,"WINDOW TEST")
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT,"Robot_AI – \
+        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Robot_AI – \
 The machine spirits have awoken; to the detriment of mankind!")
-
+        
+        # Load the sound when the application starts
+        self.laser_sound = arcade.load_sound("laser.wav")
+    
         # Var lists holders
         self.hero_list = None
         self.robot_list = None
@@ -69,7 +103,17 @@ The machine spirits have awoken; to the detriment of mankind!")
 
         # Background color
         arcade.set_background_color(arcade.color.ASH_GREY)
+
+        # HERO DECLARED
+        self.hero = hero(50, 50, 0, arcade.color.AUBURN)
         
+    def Key_Release(self, key, modifiers):
+        # When key released
+        if key == arcade.key.LEFT or key == arcade.key.RIGHT:
+            self.hero.change_x = 0
+        elif key == arcade.UP or key == arcade.key.DOWN:
+            self.hero.change_y = 0
+                    
 
     def setup(self):
         """Starts game initializing vars"""
@@ -136,20 +180,60 @@ The machine spirits have awoken; to the detriment of mankind!")
         # Bullet Fire
         bullet = arcade.Sprite("bullet.gif", SPRITE_SCALING_BULLET)
         bullet.change_x = Bullet_Speed
+        # bullet.angle = 180  --NOT NEEDED-- DSR
         bullet.center_x = self.hero_sprite.center_x
         bullet.center_y = self.hero_sprite.center_y
         bullet.left = self.hero_sprite.right
         self.bullet_list.append(bullet)
-
-    def Sound_ON_Mouse(self):
-        # LOADS SOUND
-        self.laser_sound = arcade.load_sound("laser.wav")
-        # MOUSE LEFT OR RIGHT KEY PRESS TRIGGERS LASER-SOUND
-        if key == arcade.key.LEFT or RIGHT:
+        if button == arcade.MOUSE_BUTTON_LEFT:
             arcade.play_sound(self.laser_sound)
+            print("Left mouse button pressed at", x, y)
+        elif button == arcade.MOUSE_BUTTON_RIGHT:
+            arcade.play_sound(self.laser_sound)
+            print("Right mouse button pressed at", x, y)
+
+    def on_key_motion(self, x, y, dx, dy):
+        """up-down-left-right - CTRL COMMANDS"""
+        # Hero Mouse Matched
+        self.hero_sprite.center_x = x
+        self.hero_sprite.center_y = y
         
-        
-        
+    def update(self, delta_time):
+        self.hero.draw()
+            
+    def on_key_press(self, key, modifiers):
+        # If the user hits the space bar, play the sound that we loaded
+        if key == arcade.key.SPACE:
+            print("Space-bar hit")
+            bullet = arcade.Sprite("bullet.gif", SPRITE_SCALING_BULLET)
+            bullet.change_x = Bullet_Speed
+            bullet.angle = 35 # --NOT NEEDED-- Testing use only--SEE DIFFERENCE
+            bullet.center_x = self.hero_sprite.center_x
+            bullet.center_y = self.hero_sprite.center_y
+            bullet.left = self.hero_sprite.right
+            self.bullet_list.append(bullet)
+            arcade.play_sound(self.laser_sound)
+        # CALLED WHEN USER PRESSES KEYS
+        # l.R,Up, DWN Keys for additional PLAYER-HERO-MOVEMENT
+        if key == arcade.key.LEFT:
+            print("LEFT ARROW HIT")
+            self.hero.change_x = -MOVEMENT_SPEED
+        elif key == arcade.key.RIGHT:
+            print("RIGHT ARROW HIT")
+            self.hero.change_x = MOVEMENT_SPEED
+        elif key == arcade.key.UP:
+            print("UP ARROW HIT")
+            self.hero.change_y = MOVEMENT_SPEED
+        elif key == arcade.key.DOWN:
+            print("DOWN ARROW HIT")
+            self.hero.change_y = -MOVEMENT_SPEED
+
+    def Key_Release(self, key, modifiers):
+        # When key released
+        if key == arcade.key.LEFT or key == arcade.key.RIGHT:
+            self.hero.change_x = 0
+        elif key == arcade.UP or key == arcade.key.DOWN:
+            self.hero.change_y = 0
     
     def update(self, delta_time):
         """Moving Logic for Game"""
@@ -178,37 +262,7 @@ The machine spirits have awoken; to the detriment of mankind!")
                  robot.kill()
                  self.score += 1
              if bullet.left > SCREEN_WIDTH:
-                bullet.kill()
-       
-    def Key_Pressed(self, key, modifiers):
-        # CALLED WHEN USER PRESSES KEYS
-        if key == arcade.key.LEFT:
-            self.hero.change_x = -MOVEMENT_SPEED
-        elif key == arcade.key.RIGHT:
-            self.hero.change_x = MOVEMENT_SPEED
-        elif key == arcade.key.UP:
-            self.hero.change_y = MOVEMENT_SPEED
-        elif key == arcade.key.DOWN:
-            self.hero.change_y = -MOVEMENT_SPEED
-            # SPACE BAR PRESSED
-        elif key == arcade.key.SPACE:
-            self.bullet.change_y and change_x ####
-        # SOUND LASER FIRES laser.wav FILE
-        # SPACE BAR AND LEFT AND RIGHT MOUSE KEYS
-        elif key == arcade.key.SPACE:
-            arcade.play_sound(self.laser_sound)
-        
-
-    def Key_Release(self, key, modifiers):
-        # When key released
-        if key == arcade.key.LEFT or key == arcade.key.RIGHT:
-            self.hero.change_x = 0
-        elif key == arcade.UP or key == arcade.key.DOWN:
-            self.hero.change_y = 0
-        # SPACE BAR RELEASED
-        #elif key == arcade.SPACE
-            #self.hero.change_y = 0
-    
+                bullet.kill()    
         
 def main():
     # Main Event
