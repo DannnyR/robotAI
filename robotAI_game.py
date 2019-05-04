@@ -2,6 +2,7 @@
 
 import random
 import arcade
+import os
 
 
 # --- Constants ---
@@ -14,7 +15,29 @@ SCREEN_WIDTH = 1800
 SCREEN_HEIGHT = 700
 
 Bullet_Speed = 5
+
 MOVEMENT_SPEED = 3
+
+EXPLOSION_TEXTURE_COUNT = 60
+
+
+class Explosion(arcade.Sprite):
+    # This is the robot explosion gif
+    explosion_textures = []
+    
+    def __init__(self, texture_list):
+        super().__init__("images/explosion0000.png")
+        # STart frame
+        self.current_texture = 0
+        self.textures = texture_list
+
+    def update(self):
+        # THis code updates deletes boom_sprite
+        self.current_texture += 1
+        if self.current_texture < len(self.textures):
+            self.set_texture(self.current_texture)
+        else:
+            self.kill()
 
 class hero:
     def __init__(self, position_x, position_y, change_x, change_y):
@@ -68,6 +91,9 @@ class View(arcade.Window):
         # 1. arcade.open_window(SCREEN_WIDTH, SCREEN_HEIGHT,"WINDOW TEST")
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Robot_AI – \
 The machine spirits have awoken; to the detriment of mankind!")
+        # Working directory
+        file_path = os.path.dirname(os.path.abspath(__file__))
+        os.chdir(file_path)
         
         # Load the sound when the application starts
         self.laser_sound = arcade.load_sound("laser.wav")
@@ -76,6 +102,7 @@ The machine spirits have awoken; to the detriment of mankind!")
         self.hero_list = None
         self.robot_list = None
         self.bullet_list = None
+        self.explosions_list = None
 
         # Hero set up inf0
         self.hero_sprite = None
@@ -90,6 +117,15 @@ The machine spirits have awoken; to the detriment of mankind!")
 
         # HERO DECLARED
         self.hero = hero(50, 50, 0, arcade.color.AUBURN)
+
+        # exploder loader ----------
+        self.explosion_texture_list = []
+        
+        for i in range(EXPLOSION_TEXTURE_COUNT):
+            # image loaded here
+            texture_name = f"images/explosion{i:04d}.png"
+
+            self.explosion_texture_list.append(arcade.load_texture(texture_name))
         
     def Key_Release(self, key, modifiers):
         # When key released
@@ -106,6 +142,7 @@ The machine spirits have awoken; to the detriment of mankind!")
         self.hero_list = arcade.SpriteList()
         self.robot_list = arcade.SpriteList()
         self.bullet_list = arcade.SpriteList()
+        self.explosions_list = arcade.SpriteList()
 
         # setup HERO - hat tip Collin
         self.hero_sprite = arcade.Sprite("Gun_Knight.gif", SPRITE_SCALING_HERO)
@@ -124,7 +161,7 @@ The machine spirits have awoken; to the detriment of mankind!")
             robot = Robot("ROBOT-MARK1.gif", SPRITE_SCALING_ROBOT)
             # ROBOT PLACED ON MAP
             robot.center_x = random.randrange(SCREEN_WIDTH)
-            robot.center_y = random.randrange(SCREEN_WIDTH)
+            robot.center_y = random.randrange(150, SCREEN_HEIGHT)
             # Twiked the negative numbers below to keep bots on screen
             robot.change_x = random.randrange(-1, 2)
             robot.change_y = random.randrange(-2, 1)
@@ -145,6 +182,8 @@ The machine spirits have awoken; to the detriment of mankind!")
         self.robot_list.draw()
         self.hero_list.draw()
         self.bullet_list.draw()
+        self.explosions_list.draw()
+        
         # Text Creation on Screen
         output = f"Score: {self.score}"
         arcade.draw_text(output, 20, 20, arcade.color.BLACK, 25)
@@ -158,7 +197,7 @@ The machine spirits have awoken; to the detriment of mankind!")
         # Hero Mouse Matched
         self.hero_sprite.center_x = x
         self.hero_sprite.center_y = y
-    
+        
         # Mouse buttons enabled
     def on_mouse_press(self, x, y, button, modifiers):
         # Bullet Fire
@@ -226,8 +265,13 @@ The machine spirits have awoken; to the detriment of mankind!")
     
     def update(self, delta_time):
         """Moving Logic for Game"""
+        
         # ****FOR NOW: Sprites called limited movement!!!!!!!
         self.robot_list.update()
+        
+        # Explode updater
+        self.explosions_list.update()
+        
         # Robot Victories
         hit_list = arcade.check_for_collision_with_list(self.hero_sprite,
                                                          self.robot_list)
@@ -246,10 +290,16 @@ The machine spirits have awoken; to the detriment of mankind!")
         for bullet in self.bullet_list:
              hit_list = arcade.check_for_collision_with_list(bullet, self.robot_list)
              if len(hit_list) > 0:
+                 explosion = Explosion(self.explosion_texture_list)
+                 #explosion.center_x = hit_list[0].center_x
+                 #explosion.center_y = hit_list[0].center-y
+                 self.explosions_list.append(explosion)
                  bullet.kill()
              for robot in hit_list:
                  robot.kill()
                  self.score += 1
+
+                 # Bullet killer when moves off-screen
              if bullet.left > SCREEN_WIDTH:
                 bullet.kill()    
         
