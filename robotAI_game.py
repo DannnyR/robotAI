@@ -79,7 +79,7 @@ class Robot(arcade.Sprite):
         if self.bottom < 0:
             self.change_y *= -1
 
-        if self.top > SCREEN_HEIGHT:
+        if self.top > SCREEN_WIDTH:
             self.change_y *= -1
 
 
@@ -124,14 +124,13 @@ The machine spirits have awoken; to the detriment of mankind!")
         for i in range(EXPLOSION_TEXTURE_COUNT):
             # image loaded here
             texture_name = f"images/explosion{i:04d}.png"
-
             self.explosion_texture_list.append(arcade.load_texture(texture_name))
         
     def Key_Release(self, key, modifiers):
         # When key released
-        if key == arcade.key.LEFT or key == arcade.key.RIGHT:
+        if key == arcade.key.LEFT or key == arcade.KEY.RIGHT:
             self.hero.change_x = 0
-        elif key == arcade.UP or key == arcade.key.DOWN:
+        elif key == arcade.UP or key == arcade.KEY.DOWN:
             self.hero.change_y = 0
                     
 
@@ -151,9 +150,7 @@ The machine spirits have awoken; to the detriment of mankind!")
         self.hero_sprite.center_y = 50
         # Adds Hero to list
         self.hero_list.append(self.hero_sprite)
-        # self.draw_switch.random.randrange(SCREEN_WIDTH)
-        # self.draw_Smiles.left_y = 0
-
+        
         # create robot - hat tip Dan
         for i in range(ROBOT_COUNT):
 
@@ -275,6 +272,7 @@ The machine spirits have awoken; to the detriment of mankind!")
         # Robot Victories
         hit_list = arcade.check_for_collision_with_list(self.hero_sprite,
                                                          self.robot_list)
+        
         # for loop for counting collisions and removing dead robots
         for robot in hit_list:
             # robot.kill() ---NO KILL COMMAND CONTIMUES ROBOT TOP OF SCREEN
@@ -291,8 +289,8 @@ The machine spirits have awoken; to the detriment of mankind!")
              hit_list = arcade.check_for_collision_with_list(bullet, self.robot_list)
              if len(hit_list) > 0:
                  explosion = Explosion(self.explosion_texture_list)
-                 #explosion.center_x = hit_list[0].center_x
-                 #explosion.center_y = hit_list[0].center-y
+                 explosion.center_x = hit_list[0].center_y
+                 explosion.center_y = hit_list[0].center_y
                  self.explosions_list.append(explosion)
                  bullet.kill()
              for robot in hit_list:
