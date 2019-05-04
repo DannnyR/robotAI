@@ -14,7 +14,7 @@ SCREEN_WIDTH = 1800
 SCREEN_HEIGHT = 700
 
 Bullet_Speed = 5
-MOVEMENT_SPEED = 2
+MOVEMENT_SPEED = 3
 
 class hero:
     def __init__(self, position_x, position_y, change_x, change_y):
@@ -27,23 +27,7 @@ class hero:
 
     def draw(self):
         # HERO instance vars
-        arcade.sprite_hero(self.position_x, self.position_y)
-
-    def update(self):
-        self.position_y += self.change_y
-        self.position_x += self.change_x
-        # Keep hero on screen
-        if self.position_x < self.radius:
-            self.position_x = self.radius
-            
-        if self.position_x > SCREEN_WIDTH - self.radius:
-            self.position_x = SCREEN_WIDTH - self.radius
-            
-        if self.position_y < self.radius:
-            self.position_y = self.radius
-            
-        if self.position_y > SCREEN_HEIGHT - self.radius:
-            self.position_y = SCREEN_HEIGHT - self.radius        
+        arcade.sprite_hero(self.position_x, self.position_y)      
 
 class Robot(arcade.Sprite):
     # Robots sprite creation
@@ -200,6 +184,10 @@ The machine spirits have awoken; to the detriment of mankind!")
         
     def update(self, delta_time):
         self.hero.draw()
+        # Move the ball
+        self.position_y += self.change_y
+        self.position_x += self.change_x
+        
             
     def on_key_press(self, key, modifiers):
         # If the user hits the space bar, play the sound that we loaded
@@ -207,7 +195,7 @@ The machine spirits have awoken; to the detriment of mankind!")
             print("Space-bar hit")
             bullet = arcade.Sprite("bullet.gif", SPRITE_SCALING_BULLET)
             bullet.change_x = Bullet_Speed
-            bullet.angle = 35 # --NOT NEEDED-- Testing use only--SEE DIFFERENCE
+            bullet.angle = 30 # --NOT NEEDED-- Testing use only--SEE DIFFERENCE
             bullet.center_x = self.hero_sprite.center_x
             bullet.center_y = self.hero_sprite.center_y
             bullet.left = self.hero_sprite.right
@@ -215,25 +203,26 @@ The machine spirits have awoken; to the detriment of mankind!")
             arcade.play_sound(self.laser_sound)
         # CALLED WHEN USER PRESSES KEYS
         # l.R,Up, DWN Keys for additional PLAYER-HERO-MOVEMENT
+        # NOT WORKING AS EXPECTED!!!--------------------------
         if key == arcade.key.LEFT:
             print("LEFT ARROW HIT")
-            self.hero.change_x = -MOVEMENT_SPEED
+            self.hero_sprite.change_x = -MOVEMENT_SPEED
         elif key == arcade.key.RIGHT:
             print("RIGHT ARROW HIT")
-            self.hero.change_x = MOVEMENT_SPEED
+            self.hero_sprite.change_x = MOVEMENT_SPEED
         elif key == arcade.key.UP:
             print("UP ARROW HIT")
-            self.hero.change_y = MOVEMENT_SPEED
+            self.hero_sprite.change_y = MOVEMENT_SPEED
         elif key == arcade.key.DOWN:
             print("DOWN ARROW HIT")
-            self.hero.change_y = -MOVEMENT_SPEED
+            self.hero_sprite.change_y = -MOVEMENT_SPEED
 
     def Key_Release(self, key, modifiers):
         # When key released
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
-            self.hero.change_x = 0
+            self.hero_sprite.change_x = 0
         elif key == arcade.UP or key == arcade.key.DOWN:
-            self.hero.change_y = 0
+            self.hero_sprite.change_y = 0
     
     def update(self, delta_time):
         """Moving Logic for Game"""
